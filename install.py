@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from __future__ import print_function
 import os
@@ -85,7 +85,7 @@ def main():
     install_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 
     mkdir(config_dir_abosulte_path)
-    
+
     write_to_file(
         os.path.join(config_dir_abosulte_path, 'marker.sh'),
         generate_marker_sh(config_dir_abosulte_path, install_dir))

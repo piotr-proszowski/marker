@@ -11,7 +11,7 @@ function get_cursor_position(){
   # based on a script from http://invisible-island.net/xterm/xterm.faq.html
   exec < /dev/tty
   echo -en "\033[6n" > /dev/tty
-  IFS=';' read -r -d R  row col 
+  IFS=';' read -r -d R  row col
   # change from one-based to zero based so they work with: tput cup $row $col
   row=$((${row:2} - 1))    # strip off the esc-[
   col=$((${col} - 1))
@@ -54,9 +54,9 @@ if [[ -n "$ZSH_VERSION" ]]; then
         # extract the word under cursor
         word=$(echo "${BUFFER[0,offset]}" | grep -oE '[^\|]+$')
         place_cursor_next_line
-        
+
         run_marker "$word"
-        
+
         # append the completion path to the user buffer
         word_length=${#word}
 
@@ -83,26 +83,26 @@ if [[ -n "$ZSH_VERSION" ]]; then
         BUFFER="$TMP_MARKER"
         zle end-of-line
     }
-    # move the cursor the next placeholder 
+    # move the cursor the next placeholder
     function _move_cursor_to_next_placeholder {
         match=$(echo "$BUFFER" | perl -nle 'print $& if m{\{\{.+?\}\}}' | head -n 1)
         if [[ ! -z "$match" ]]; then
             len=${#match}
             match=$(echo "$match" | sed 's/"/\\"/g')
-            placeholder_offset=$(echo "$BUFFER" | python -c 'import sys;keyboard_input = raw_input if sys.version_info[0] == 2 else input; print(keyboard_input().index("'$match'"))')
+            placeholder_offset=$(echo "$BUFFER" | python3 -c 'import sys;keyboard_input = raw_input if sys.version_info[0] == 2 else input; print(keyboard_input().index("'$match'"))')
             CURSOR="$placeholder_offset"
             BUFFER="${BUFFER[1,$placeholder_offset]}${BUFFER[$placeholder_offset+1+$len,-1]}"
-        fi        
+        fi
     }
 
     zle -N _marker_get
     zle -N _move_cursor_to_next_placeholder
-    bindkey "$marker_key_get" _marker_get 
+    bindkey "$marker_key_get" _marker_get
     bindkey "$marker_key_next_placeholder" _move_cursor_to_next_placeholder
 
     zle -N _marker_mark_1
     bindkey '\emm1' _marker_mark_1
-    zle -N _marker_mark_2 
+    zle -N _marker_mark_2
     bindkey '\emm2' _marker_mark_2
     bindkey -s "$marker_key_mark" '\emm1\emm2'
 
@@ -114,10 +114,10 @@ elif [[ -n "$BASH" ]]; then
         if [[ ! -z "$match" ]]; then
             len=${#match}
             match=$(echo "$match" | sed 's/"/\\"/g')
-            placeholder_offset=$(echo "$READLINE_LINE" | python -c 'import sys;keyboard_input = raw_input if sys.version_info[0] == 2 else input; print(keyboard_input().index("'$match'"))')
+            placeholder_offset=$(echo "$READLINE_LINE" | python3 -c 'import sys;keyboard_input = raw_input if sys.version_info[0] == 2 else input; print(keyboard_input().index("'$match'"))')
             READLINE_POINT="$placeholder_offset"
             READLINE_LINE="${READLINE_LINE:0:$placeholder_offset}${READLINE_LINE:$placeholder_offset+$len}"
-        fi        
+        fi
     }
 
     # Look at zsh _marker_get docstring
@@ -153,13 +153,13 @@ elif [[ -n "$BASH" ]]; then
     function _marker_mark_2 {
         READLINE_LINE="$TMP_MARKER"
         READLINE_POINT="${#READLINE_LINE}"
-    }   
+    }
 
     bind -x '"'"$marker_key_get"'":_marker_get'
 
     bind -x '"\em1":"_marker_mark_1"'
     bind -x '"\em2":"_marker_mark_2"'
-    bind '"'"$marker_key_mark"'":"\em1\n\em2"'   
+    bind '"'"$marker_key_mark"'":"\em1\n\em2"'
 
     bind -x '"'"$marker_key_next_placeholder"'":"_move_cursor_to_next_placeholder"'
 fi
